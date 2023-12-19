@@ -3,12 +3,17 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtCodeSnippetStatement;
 import spoon.reflect.declaration.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class LogAnnotationProcessor extends AbstractProcessor<CtClass<?>> {
-    private static final String LOG4J_IMPORT = "import org.apache.logging.log4j.LogManager;";
-    private static final String LOGGER_IMPORT = "import org.apache.logging.log4j.Logger;";
+
+        private static final String LOG4J_IMPORT = "import org.apache.logging.log4j.LogManager;";
+        private static final String LOGGER_IMPORT = "import org.apache.logging.log4j.Logger;";
+        private static final String LOCALDATETIME_IMPORT = "import java.time.LocalDateTime;";
+        private static final String DATETIMEFORMATTER_IMPORT = "import java.time.format.DateTimeFormatter;";
 
     @Override
     public void process(CtClass<?> ctClass) {
@@ -63,17 +68,29 @@ public class LogAnnotationProcessor extends AbstractProcessor<CtClass<?>> {
             field2.setModifiers(Set.of(ModifierKind.PRIVATE,ModifierKind.STATIC));
             field2.setType(getFactory().Type().createReference("org.apache.logging.log4j.LogManager"));
             ctClass.addFieldAtTop(field2);
+
+            CtField<?> field3 = getFactory().createField();
+            field3.setSimpleName("localDateTime");
+            field3.setModifiers(Set.of(ModifierKind.PRIVATE,ModifierKind.STATIC));
+            field3.setType(getFactory().Type().createReference("java.time.LocalDateTime"));
+            ctClass.addFieldAtTop(field3);
+
+            CtField<?> field4 = getFactory().createField();
+            field4.setSimpleName("dateTimeFormatter");
+            field4.setModifiers(Set.of(ModifierKind.PRIVATE,ModifierKind.STATIC));
+            field4.setType(getFactory().Type().createReference("java.time.format.DateTimeFormatter"));
+            ctClass.addFieldAtTop(field4);
         }
 
     }
 
     private String generateLogStatement2(String type, String method, ArrayList<String> paramlist) {
         String params = String.join(", ", paramlist);
-        return String.format("logger.info(\"[%s] Method : %s, Parameters : %s\")", type, method, params);
+        return String.format("logger.info(\"[{}] [%s] Method : %s, Parameters : %s\", %s)", type, method, params, "LocalDateTime.now().format(DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss\"))");
     }
 
     private String generateLogStatement() {
-        return "logger.info(\"Hello, Worldos!\")";
+        return "logger.info(\"Hello, World!\")";
     }
 
 }
