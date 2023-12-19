@@ -7,20 +7,13 @@ import spoon.reflect.CtModel;
 public class Main {
     public static void main(String[] args) {
         // Création du lanceur Spoon
-        Launcher spoonLauncher = new Launcher();
+//        CodeProcessor processor = new CodeProcessor("/home/mathieu/Documents/logger");
+        CodeProcessor processor = new CodeProcessor("C:\\Users\\victo\\Documents\\GitHub\\logger");
 
-        // Ajout du processor LogAnnotationProcessor
-        spoonLauncher.addProcessor(new LogAnnotationProcessor());
+        CodeProcessor codeGenerationProcessor = processor;
+        codeGenerationProcessor.apply(new LogAnnotationProcessor());
 
-        // Chemin ou package contenant vos classes à analyser
-        spoonLauncher.addInputResource("/home/mathieu/Documents/logger");
-        spoonLauncher.setSourceOutputDirectory("/home/mathieu/Documents/test");
 
-        // Lancement de l'analyse avec Spoon
-        spoonLauncher.run();
-
-        // Obtention du modèle Spoon
-        CtModel model = spoonLauncher.getModel();
 
     }
 }
