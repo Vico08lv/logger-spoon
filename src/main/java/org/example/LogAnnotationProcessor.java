@@ -86,7 +86,26 @@ public class LogAnnotationProcessor extends AbstractProcessor<CtClass<?>> {
 
     private String generateLogStatement2(String type, String method, ArrayList<String> paramlist) {
         String params = String.join(", ", paramlist);
-        return String.format("logger.warn(\"[{}] [%s] Method : %s, Parameters : %s\", %s)", type, method, params, "LocalDateTime.now().format(DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss\"))");
+        String log = "logger.warn(\" ["+type+"] , Method : " + method + " , ";
+
+        for ( int i = 0; i < paramlist.size(); i++)
+        {
+            log = log +" "+paramlist.get(i)  +" : "+ " [{}] ";
+        }
+
+        log = log + "\" , ";
+
+        for (String param : paramlist)
+        {
+
+
+            log = log + param + ",";
+        }
+
+        log = log.substring(0,log.length()-1) + ");";
+        return log;
+
+//        return String.format("logger.warn(\"[{}] [%s] Method : %s, Parameters : %s\", %s)", type, method, params, "LocalDateTime.now().format(DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss\"))");
     }
 
     private String generateLogStatement() {
