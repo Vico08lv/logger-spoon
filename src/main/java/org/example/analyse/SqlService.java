@@ -14,8 +14,8 @@ public class SqlService {
         // Requête pour créer une table
         String createReadTable = "CREATE TABLE profil_read ( " +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                "id_user BIGINT, " +
-                "id_produit BIGINT, " +
+                "id_user BIGINT NULL, " +
+                "id_produit BIGINT NULL, " +
                 "method VARCHAR(50), " +
                 "jour_heure VARCHAR(100),"+
                 "FOREIGN KEY (id_user) REFERENCES user(id)," +
@@ -24,8 +24,8 @@ public class SqlService {
 
         String createWriteTable = "CREATE TABLE profil_write ( " +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                "id_user BIGINT, " +
-                "id_produit BIGINT, " +
+                "id_user BIGINT NULL, " +
+                "id_produit BIGINT NULL, " +
                 "method VARCHAR(50), " +
                 "type VARCHAR(50), " +
                 "jour_heure VARCHAR(100),"+
@@ -57,12 +57,21 @@ public class SqlService {
     }
 
 
-    public static void insertIntoProfilRead(Connection connection, long userId, long productId, String method, String jour_heure) throws SQLException {
+    public static void insertIntoProfilRead(Connection connection, Long userId, Long productId, String method, String jour_heure) throws SQLException {
         String insertQuery = "INSERT INTO profil_read (id_user, id_produit, method, jour_heure) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setLong(2, productId);
+            if (userId != null) {
+                preparedStatement.setObject(1, userId);
+            } else {
+                preparedStatement.setNull(1, Types.BIGINT); // Si userId est null, définir la valeur de la colonne comme NULL
+            }
+
+            if (productId != null) {
+                preparedStatement.setObject(2, productId);
+            } else {
+                preparedStatement.setNull(2, Types.BIGINT); // Si productId est null, définir la valeur de la colonne comme NULL
+            }
             preparedStatement.setString(3, method);
             preparedStatement.setString(4, jour_heure);
 
@@ -70,12 +79,21 @@ public class SqlService {
         }
     }
 
-    public static void insertIntoProfilWrite(Connection connection, long userId, long productId, String method, String type, String jour_heure) throws SQLException {
+    public static void insertIntoProfilWrite(Connection connection, Long userId, Long productId, String method, String type, String jour_heure) throws SQLException {
         String insertQuery = "INSERT INTO profil_write (id_user, id_produit, method, type, jour_heure) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setLong(2, productId);
+            if (userId != null) {
+                preparedStatement.setObject(1, userId);
+            } else {
+                preparedStatement.setNull(1, Types.BIGINT); // Si userId est null, définir la valeur de la colonne comme NULL
+            }
+
+            if (productId != null) {
+                preparedStatement.setObject(2, productId);
+            } else {
+                preparedStatement.setNull(2, Types.BIGINT); // Si productId est null, définir la valeur de la colonne comme NULL
+            }
             preparedStatement.setString(3, method);
             preparedStatement.setString(4, type);
             preparedStatement.setString(5, jour_heure);
@@ -84,12 +102,21 @@ public class SqlService {
         }
     }
 
-    public static void insertIntoProfilExpensive(Connection connection, long userId, long productId, String method, int prix, String jour_heure) throws SQLException {
+    public static void insertIntoProfilExpensive(Connection connection, Long userId, Long productId, String method, int prix, String jour_heure) throws SQLException {
         String insertQuery = "INSERT INTO profil_expensive (id_user, id_produit, method, prix, jour_heure) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-            preparedStatement.setLong(1, userId);
-            preparedStatement.setLong(2, productId);
+            if (userId != null) {
+                preparedStatement.setObject(1, userId);
+            } else {
+                preparedStatement.setNull(1, Types.BIGINT); // Si userId est null, définir la valeur de la colonne comme NULL
+            }
+
+            if (productId != null) {
+                preparedStatement.setObject(2, productId);
+            } else {
+                preparedStatement.setNull(2, Types.BIGINT); // Si productId est null, définir la valeur de la colonne comme NULL
+            }
             preparedStatement.setString(3, method);
             preparedStatement.setInt(4, prix);
             preparedStatement.setString(5, jour_heure);
