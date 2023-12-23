@@ -4,18 +4,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
  * @Note : Récapitulatif du travail qu'il reste a réaliser
  *
- * TODO: continuer le parse pour save les profil quand c'est le bon
- * TODO : 1 -> Filter pour le cas profil_expensive
- * TODO : 2 -> Continuer pour les méthodes POST
- * TODO : 3 -> Réflexion sur la structure de l'api/des arguments/ des logs ( pour rapport) pour pb d'analyse
- * !! TODO : refactor parseLogLine(..) car beaucoup trop long
+ * TODO :  Gerer des logs dans un cas concret et tester si tout est ok
+ * TODO :  Réflexion sur la structure de l'api/des arguments/ des logs ( pour rapport) pour pb d'analyse
  */
 
 public class MainAnalyse {
@@ -33,6 +32,8 @@ public class MainAnalyse {
     private static double[] stat_prix_produit;
     private static final SqlService SQL_SERVICE = new SqlService();
 
+    private static List<Integer> productsExpensive = new ArrayList<>();
+
     public static void main(String[] args) throws SQLException {
 
         /**
@@ -44,6 +45,8 @@ public class MainAnalyse {
          * Objetnir les statistique de la table product
          */
         stats();
+
+
 
 
 
@@ -153,8 +156,14 @@ public class MainAnalyse {
                         method,
                         dateTime
                 );
+
+                if (productsExpensive.contains(id_p))
+                {
+                    insertIntoProfilExpensive(id_u, id_p, method, dateTime);
+                }
+
                 break;
-            case  "PUT", "DELETE":
+            case  "PUT", "DELETE", "POST":
                 insertIntoProfilWrite(
                         id_u,
                         id_p,
@@ -186,6 +195,8 @@ public class MainAnalyse {
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             stat_prix_produit = SQL_SERVICE.calculateMedianAndUpperQuartile(connection);
+
+            productsExpensive = SQL_SERVICE.productExpensive(connection,stat_prix_produit[0]);
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -243,7 +254,7 @@ public class MainAnalyse {
     /**
      * Insertion dans le profil_expensive
      */
-    private static void insertIntoProfilExpensive(Long userId, Long productId, String method, int prix, String jour_heure)
+    private static void insertIntoProfilExpensive(Long userId, Long productId, String method,  String jour_heure)
     {
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
@@ -253,7 +264,6 @@ public class MainAnalyse {
                     userId,
                     productId,
                     method,
-                    prix,
                     jour_heure
             );
             // Fermeture des ressources

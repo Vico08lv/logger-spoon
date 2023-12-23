@@ -1,7 +1,11 @@
 package org.example.analyse;
 
 
+import com.mysql.cj.xdevapi.StreamingSqlResultBuilder;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SqlService {
 
@@ -39,7 +43,6 @@ public class SqlService {
                 "id_user BIGINT, " +
                 "id_produit BIGINT, " +
                 "method VARCHAR(50), " +
-                "prix INT, " +
                 "jour_heure VARCHAR(100),"+
                 "FOREIGN KEY (id_user) REFERENCES user(id)," +
                 "FOREIGN KEY (id_produit) REFERENCES product(id)" +
@@ -102,8 +105,8 @@ public class SqlService {
         }
     }
 
-    public static void insertIntoProfilExpensive(Connection connection, Long userId, Long productId, String method, int prix, String jour_heure) throws SQLException {
-        String insertQuery = "INSERT INTO profil_expensive (id_user, id_produit, method, prix, jour_heure) VALUES (?, ?, ?, ?, ?)";
+    public static void insertIntoProfilExpensive(Connection connection, Long userId, Long productId, String method, String jour_heure) throws SQLException {
+        String insertQuery = "INSERT INTO profil_expensive (id_user, id_produit, method,jour_heure) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
             if (userId != null) {
@@ -118,7 +121,6 @@ public class SqlService {
                 preparedStatement.setNull(2, Types.BIGINT); // Si productId est null, définir la valeur de la colonne comme NULL
             }
             preparedStatement.setString(3, method);
-            preparedStatement.setInt(4, prix);
             preparedStatement.setString(5, jour_heure);
 
             preparedStatement.executeUpdate();
@@ -132,6 +134,8 @@ public class SqlService {
                 "FROM product";
 
 
+
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -141,6 +145,14 @@ public class SqlService {
 
                 System.out.println("Mediane : " + mediane);
                 System.out.println("Quartile supérieur : " + quartileSuperieur);
+
+
+                String query2 = "SELECT id " +
+                        "FROM product WHERE price >= ?";
+
+
+
+
                 return new double[]{mediane, quartileSuperieur};
             }
 
@@ -148,5 +160,38 @@ public class SqlService {
         }
         return null;
     }
+
+    public static List<Integer>  productExpensive(Connection connection, double value) throws SQLException {
+        String query = "SELECT " +
+                "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY price) OVER () AS mediane, " +
+                "PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY price) OVER () AS quartile_superieur " +
+                "FROM product";
+
+
+                String query2 = "SELECT id " +
+                        "FROM product WHERE price >= ?";
+
+                List<Integer> producstId = new ArrayList<>();
+
+
+                // Préparation de la deuxième requête avec un PreparedStatement
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(query2)) {
+                    preparedStatement2.setDouble(1, value);
+                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+                    while (resultSet2.next()) {
+                        producstId.add(resultSet2.getInt("id"));
+                        System.out.println(resultSet2.getInt("id"));
+                    }
+                }
+
+
+
+
+
+
+        return producstId;
+    }
+
+
 
 }
