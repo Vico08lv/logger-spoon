@@ -121,7 +121,7 @@ public class SqlService {
                 preparedStatement.setNull(2, Types.BIGINT); // Si productId est null, définir la valeur de la colonne comme NULL
             }
             preparedStatement.setString(3, method);
-            preparedStatement.setString(5, jour_heure);
+            preparedStatement.setString(4, jour_heure);
 
             preparedStatement.executeUpdate();
         }
@@ -161,7 +161,7 @@ public class SqlService {
         return null;
     }
 
-    public static List<Integer>  productExpensive(Connection connection, double value) throws SQLException {
+    public static List<Long>  productExpensive(Connection connection, double value) throws SQLException {
         String query = "SELECT " +
                 "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY price) OVER () AS mediane, " +
                 "PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY price) OVER () AS quartile_superieur " +
@@ -171,7 +171,7 @@ public class SqlService {
                 String query2 = "SELECT id " +
                         "FROM product WHERE price >= ?";
 
-                List<Integer> producstId = new ArrayList<>();
+                List<Long> producstId = new ArrayList<>();
 
 
                 // Préparation de la deuxième requête avec un PreparedStatement
@@ -179,7 +179,7 @@ public class SqlService {
                     preparedStatement2.setDouble(1, value);
                     ResultSet resultSet2 = preparedStatement2.executeQuery();
                     while (resultSet2.next()) {
-                        producstId.add(resultSet2.getInt("id"));
+                        producstId.add((long) resultSet2.getInt("id"));
                         System.out.println(resultSet2.getInt("id"));
                     }
                 }

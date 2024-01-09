@@ -1,5 +1,6 @@
 package org.example.analyse;
 
+import javax.swing.text.html.parser.Parser;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class MainAnalyse {
     private static double[] stat_prix_produit;
     private static final SqlService SQL_SERVICE = new SqlService();
 
-    private static List<Integer> productsExpensive = new ArrayList<>();
+    private static List<Long> productsExpensive = new ArrayList<>();
 
     public static void main(String[] args) throws SQLException {
 
@@ -47,6 +48,7 @@ public class MainAnalyse {
         stats();
 
 
+        System.out.println(stat_prix_produit);
 
 
 
@@ -55,6 +57,8 @@ public class MainAnalyse {
          * ce projet contient les logs inseré automatiquement par Spooon
          */
         String filePath = "/home/mathieu/Documents/EVOLUTION/logger-after/myLogs.xml";
+//        String filePath = "/home/mathieu/Téléchargements/myLogs.xml";
+
 
         // ouverture du fichier
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
